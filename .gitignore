@@ -8,3 +8,5 @@
 **/*.png
 **/*.jpg
 /venv/
+/imagenette2-160/
+model.ckpt
