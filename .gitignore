@@ -3,9 +3,6 @@
 **/nsfw-ids.txt
 **/*.caption
 **/dataset*.tar
-**/*.json
-**/*.png
-**/*.jpg
 /venv/
 /imagenette2-160/
 model.ckpt
