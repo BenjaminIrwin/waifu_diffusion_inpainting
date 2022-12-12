@@ -239,7 +239,7 @@ class Resize():
 
         self.resize = self.__no_migration
 
-    def __no_migration(self, image_path: str, w: int, h: int) -> Img:
+    def __no_migration(self, image_path: str, w: int, h: int) -> Image:
         return ImageOps.fit(
             Image.open(image_path),
             (w, h),
@@ -248,7 +248,7 @@ class Resize():
             method=Image.Resampling.LANCZOS
         ).convert(mode='RGB')
 
-    def __migration(self, image_path: str, w: int, h: int) -> Img:
+    def __migration(self, image_path: str, w: int, h: int) -> Image:
         filename = re.sub('\.[^/.]+$', '', os.path.split(image_path)[1])
 
         image = ImageOps.fit(
@@ -280,7 +280,7 @@ class Resize():
 
         return image
 
-    def __no_op(self, image_path: str, w: int, h: int) -> Img:
+    def __no_op(self, image_path: str, w: int, h: int) -> Image:
         return Image.open(image_path)
 
 
@@ -309,7 +309,7 @@ class ImageStore:
         return len(self.image_files)
 
     # iterator returns images as PIL images and their index in the store
-    def entries_iterator(self) -> Generator[Tuple[Img, int], None, None]:
+    def entries_iterator(self) -> Generator[Tuple[Image, int], None, None]:
         for f in range(len(self)):
             yield Image.open(self.image_files[f]), f
 
