@@ -309,9 +309,9 @@ class ImageStore:
         return len(self.image_files)
 
     # iterator returns images as PIL images and their index in the store
-    def entries_iterator(self) -> Generator[Tuple[Image, int], None, None]:
-        for f in range(len(self)):
-            yield Image.open(self.image_files[f]), f
+    # def entries_iterator(self) -> Generator[Tuple[Image, int], None, None]:
+    #     for f in range(len(self)):
+    #         yield Image.open(self.image_files[f]), f
 
     # get image by index
     def get_image_and_mask(self, ref: Tuple[int, int, int]):
