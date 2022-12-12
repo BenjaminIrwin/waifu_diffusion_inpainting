@@ -342,6 +342,7 @@ class ImageStore:
             if self.validator(img):
                 # Extract the number from the filename
                 print('VALIDATING: ' + img)
+                print(type(img))
                 img_num = self.extract_input_num(img)
                 image_dict[img_num] = img
 
