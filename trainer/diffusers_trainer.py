@@ -363,9 +363,9 @@ class ImageStore:
         print(clean_images)
         print(clean_masks)
 
-        self.image_files = clean_images.sort()
+        self.image_files = clean_images
         print(self.image_files)
-        self.mask_files = clean_masks.sort()
+        self.mask_files = clean_masks
         print(self.mask_files)
 
 
