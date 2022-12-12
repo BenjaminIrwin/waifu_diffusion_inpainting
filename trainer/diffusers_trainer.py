@@ -285,15 +285,22 @@ class Resize():
 
 class ImageStore:
     def __init__(self, data_dir: str) -> None:
+        print('ImageStore: Initializing')
         self.data_dir = data_dir
         self.resizer = Resize(args.resize, args.no_migration).resize
         self.validator = Validation(args.skip_validation, args.extended_validation).validate
 
+        print('ImageStore: Loading images from ' + self.data_dir)
         self.image_files = []
         [self.image_files.extend(glob.glob(f'{data_dir}' + '/i*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
+        print(f'ImageStore: Found {len(self.image_files)} images')
 
+
+        print('ImageStore: Loading masks from ' + self.data_dir)
         self.mask_files = []
         [self.mask_files.extend(glob.glob(f'{data_dir}' + '/m*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
+        print(f'ImageStore: Found {len(self.mask_files)} masks')
+
 
         self.sort()
 
@@ -318,6 +325,9 @@ class ImageStore:
             return f.read()
 
     def sort(self) -> None:
+
+        print('ImageStore: Sorting images and masks')
+
         clean_images = []
         clean_masks = []
 
@@ -349,6 +359,9 @@ class ImageStore:
 
         self.image_files = clean_images.sort()
         self.mask_files = clean_masks.sort()
+        print(self.image_files)
+        print(self.mask_files)
+
 
 class InpaintDataset(torch.utils.data.Dataset):
     def __init__(self, store: ImageStore, tokenizer: CLIPTokenizer, text_encoder: CLIPTextModel, device: torch.device,
