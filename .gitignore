@@ -1,7 +1,6 @@
 /.idea/
 *_cropped/
 **/nsfw-ids.txt
-**/*.image
 **/*.caption
 **/dataset*.tar
 **/*.json
