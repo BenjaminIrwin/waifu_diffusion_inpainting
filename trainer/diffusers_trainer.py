@@ -301,7 +301,7 @@ class ImageStore:
         print(f'ImageStore: Found {len(self.mask_files)} masks')
         print(self.mask_files)
 
-        self.sort()
+        self.clean()
 
     def __len__(self) -> int:
         return len(self.image_files)
@@ -326,7 +326,7 @@ class ImageStore:
     def extract_input_num(self, path):
         return int(path.split('/')[-1].split('.')[0][1:])
 
-    def sort(self) -> None:
+    def clean(self) -> None:
 
         print('ImageStore: Sorting images and masks')
 
@@ -356,6 +356,7 @@ class ImageStore:
             # Check if the number exists in the mask dictionary
             if img_num in mask_dict:
                 # If it does, add the corresponding filenames to the clean lists
+                print('FOUND MATCHING MASK AND IMAGE: ' + str(img_num))
                 clean_images.append(image_dict[img_num])
                 clean_masks.append(mask_dict[img_num])
 
