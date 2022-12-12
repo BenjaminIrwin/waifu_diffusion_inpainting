@@ -325,6 +325,9 @@ class ImageStore:
         with open(filename, 'r', encoding='UTF-8') as f:
             return f.read()
 
+    def extract_input_num(path):
+        return int(path.split('/')[-1].split('.')[0][1:])
+
     def sort(self) -> None:
 
         print('ImageStore: Sorting images and masks')
@@ -339,7 +342,7 @@ class ImageStore:
             if self.validator(img):
                 # Extract the number from the filename
                 print('VALIDATING: ' + img)
-                img_num = int(img[1:-4])
+                img_num = self.extract_input_num(img)
                 image_dict[img_num] = img
 
         # Create a dictionary that maps mask numbers to filenames
@@ -348,7 +351,7 @@ class ImageStore:
             # If mask is valid
             if self.validator(msk):
                 # Extract the number from the filename
-                msk_num = int(msk[1:-4])
+                msk_num = self.extract_input_num(img)
                 mask_dict[msk_num] = msk
 
         # Iterate over the keys (numbers) in the image dictionary
