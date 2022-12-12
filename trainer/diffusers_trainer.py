@@ -195,12 +195,14 @@ class Validation():
         print("Validation: Standard")
 
     def __validate(self, fp: str) -> bool:
-        try:
-            Image.open(fp)
-            return True
-        except:
-            print(f'WARNING: Image cannot be opened: {fp}')
-            return False
+        # try:
+        Image.open(fp)
+        return True
+        #     return True
+        # except Exception as e:
+        #     print(f'WARNING: Image cannot be opened: {fp}')
+        #     print(e)
+        #     return False
 
     def __extended_validate(self, fp: str) -> bool:
         try:
