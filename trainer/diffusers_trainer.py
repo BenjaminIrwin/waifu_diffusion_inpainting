@@ -295,13 +295,13 @@ class ImageStore:
         self.image_files = []
         [self.image_files.extend(glob.glob(f'{data_dir}' + '/i*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
         print(f'ImageStore: Found {len(self.image_files)} images')
-
+        print(self.image_files)
 
         print('ImageStore: Loading masks from ' + self.data_dir)
         self.mask_files = []
         [self.mask_files.extend(glob.glob(f'{data_dir}' + '/m*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
         print(f'ImageStore: Found {len(self.mask_files)} masks')
-
+        print(self.mask_files)
 
         self.sort()
 
@@ -338,6 +338,7 @@ class ImageStore:
             # If image is valid
             if self.validator(img):
                 # Extract the number from the filename
+                print('VALIDATING: ' + img)
                 img_num = int(img[1:-4])
                 image_dict[img_num] = img
 
@@ -359,8 +360,8 @@ class ImageStore:
                 clean_masks.append(mask_dict[img_num])
 
         self.image_files = clean_images.sort()
-        self.mask_files = clean_masks.sort()
         print(self.image_files)
+        self.mask_files = clean_masks.sort()
         print(self.mask_files)
 
 
