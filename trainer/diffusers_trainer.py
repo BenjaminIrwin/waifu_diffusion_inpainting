@@ -305,7 +305,7 @@ class ImageStore:
             yield Image.open(self.image_files[f]), f
 
     # get image by index
-    def get_image_and_mask(self, ref) -> tuple[Image, Image]:
+    def get_image_and_mask(self, ref: Tuple[int, int, int]):
         img = self.resizer(self.image_files[ref[0]], ref[1], ref[2])
         msk = self.resizer(self.mask_files[ref[0]], ref[1], ref[2])
         return img, msk
