@@ -360,6 +360,9 @@ class ImageStore:
                 clean_images.append(image_dict[img_num])
                 clean_masks.append(mask_dict[img_num])
 
+        print(clean_images)
+        print(clean_masks)
+
         self.image_files = clean_images.sort()
         print(self.image_files)
         self.mask_files = clean_masks.sort()
