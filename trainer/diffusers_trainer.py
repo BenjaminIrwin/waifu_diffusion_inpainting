@@ -56,6 +56,7 @@ parser.add_argument('--lr', type=float, default=5e-6, help='Learning rate')
 parser.add_argument('--epochs', type=int, default=10, help='Number of epochs to train for')
 parser.add_argument('--batch_size', type=int, default=1, help='Batch size')
 parser.add_argument('--use_ema', type=bool_t, default='False', help='Use EMA for finetuning')
+parser.add_argument('--resize', type=bool_t, default='False', help='Resize input')
 parser.add_argument('--ucg', type=float, default=0.1,
                     help='Percentage chance of dropping out the text condition per batch. Ranges from 0.0 to 1.0 where 1.0 means 100% text condition dropout.')  # 10% dropout probability
 parser.add_argument('--gradient_checkpointing', dest='gradient_checkpointing', type=bool_t, default='False',
