@@ -2,7 +2,6 @@
 *_cropped/
 **/nsfw-ids.txt
 **/*.caption
-**/dataset*.tar
 /venv/
 /imagenette2-160/
 model.ckpt
