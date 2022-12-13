@@ -312,14 +312,14 @@ class ImageStore:
     #         yield Image.open(self.image_files[f]), f
 
     # get image by index
-    def get_image_and_mask(self, ref: Tuple[int, int, int]):
-        img = self.resizer(self.image_files[ref[0]], ref[1], ref[2])
-        msk = self.resizer(self.mask_files[ref[0]], ref[1], ref[2])
+    def get_image_and_mask(self, idx):
+        img = Image.open(self.image_files[idx]).convert('RGB')
+        msk = Image.open(self.mask_files[idx]).convert('RGB')
         return img, msk
 
     # gets caption by removing the extension from the filename and replacing it with .txt
-    def get_caption(self, ref: Tuple[int, int, int]) -> str:
-        filename = re.sub('\.[^/.]+$', '', self.image_files[ref[0]]) + '.txt'
+    def get_caption(self, idx) -> str:
+        filename = re.sub('\.[^/.]+$', '', self.image_files[idx]) + '.txt'
         with open(filename, 'r', encoding='UTF-8') as f:
             return f.read()
 
@@ -382,7 +382,7 @@ class InpaintDataset(torch.utils.data.Dataset):
             self.text_encoder = self.text_encoder.module
 
         self.transforms = torchvision.transforms.Compose([
-            torchvision.transforms.RandomHorizontalFlip(p=0.5),
+            # torchvision.transforms.RandomHorizontalFlip(p=0.5),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize([0.5], [0.5])
         ])
@@ -390,22 +390,27 @@ class InpaintDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.store)
 
-    def __getitem__(self, item: Tuple[int, int, int]):
+    def __getitem__(self, idx):
         return_dict = {'image_pixel_values': None, 'mask_pixel_values': None, 'masked_image_pixel_values': None, 'input_ids': None}
 
-        image, mask = self.store.get_image_and_mask(item)
+        image, mask = self.store.get_image_and_mask(idx)
+
         state = torch.get_rng_state()
         return_dict['image_pixel_values'] = self.transforms(image)
+        print('SHAPE OF IMAGE: ' + str(return_dict['image_pixel_values'].shape))
+
         torch.set_rng_state(state)
         return_dict['mask_pixel_values'] = self.transforms(mask)
+        return_dict['mask_pixel_values'] = (return_dict['mask_pixel_values'] >= 0.5).type(return_dict['mask_pixel_values'].type())
 
-        masked_image = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
         torch.set_rng_state(state)
-        return_dict['masked_image_pixel_values'] = self.transforms(masked_image)
+        masked_image = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
+
+        return_dict['masked_image_pixel_values'] = self.transforms(masked_image.numpy())
 
         # TODO: Do we still need this?
         if random.random() > self.ucg:
-            caption_file = self.store.get_caption(item)
+            caption_file = self.store.get_caption(idx)
         else:
             caption_file = ''
 
