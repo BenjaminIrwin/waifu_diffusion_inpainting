@@ -428,12 +428,15 @@ class InpaintDataset(torch.utils.data.Dataset):
         mask_values = [example["mask_pixel_values"] for example in examples]
         masked_image_values = [example["masked_image_pixel_values"] for example in examples]
 
-        print('Image Pixel Values Shape PRE-COLLATE: ', pixel_values.shape)
-        print('Masked Image Pixel Values Shape PRE COLLATE: ', masked_image_values.shape)
+        print('Image Pixel Values Shape PRE-COLLATE: ', pixel_values[0].shape)
+        print('Masked Image Pixel Values Shape PRE COLLATE: ', masked_image_values[0].shape)
 
         pixel_values = torch.stack(pixel_values).to(memory_format=torch.contiguous_format).float()
         mask_values = torch.stack(mask_values).to(memory_format=torch.contiguous_format).float()
         masked_image_values = torch.stack(masked_image_values).to(memory_format=torch.contiguous_format).float()
+
+        print('Image Pixel Values Shape POST COLLATE: ', pixel_values.shape)
+        print('Masked Image Pixel Values Shape POST COLLATE: ', masked_image_values.shape)
 
         if args.extended_mode_chunks < 2:
             max_length = self.tokenizer.model_max_length - 2
