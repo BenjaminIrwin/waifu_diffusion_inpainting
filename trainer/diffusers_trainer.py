@@ -395,7 +395,7 @@ class InpaintDataset(torch.utils.data.Dataset):
         print('MASK SHAPE PRE-BINARIZATION: ' + str(transformed_mask.shape))
         masks_sum = transformed_mask.sum(axis=0)
         binarized_mask = torch.where(masks_sum > 0, 1.0, 0.)
-        print('MASK SHAPE POST-BINARIZATION: ' + binarized_mask.shape)
+        print('MASK SHAPE POST-BINARIZATION: ' + str(binarized_mask.shape))
 
         return_dict['mask_pixel_values'] = binarized_mask
 
