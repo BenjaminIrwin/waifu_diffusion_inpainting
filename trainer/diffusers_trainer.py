@@ -407,7 +407,11 @@ class InpaintDataset(torch.utils.data.Dataset):
         torch.set_rng_state(state)
         masked_image = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
 
-        return_dict['masked_image_pixel_values'] = self.transforms(masked_image.cpu().numpy()).to(self.device)
+        print('SHAPE OF MASKED IMAGE AS TENSOR: ' + str(masked_image.shape))
+        numpy = masked_image.cpu().numpy()
+        print('SHAPE OF MASKED IMAGE AS NUMPY ARRAY: ' + str(numpy.shape))
+
+        return_dict['masked_image_pixel_values'] = self.transforms(numpy).to(self.device)
 
         print('SHAPE OF MASKED IMAGE POST TRANSFORMATIONS: ' + str(return_dict['masked_image_pixel_values'].shape))
 
