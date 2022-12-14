@@ -407,10 +407,11 @@ class InpaintDataset(torch.utils.data.Dataset):
         torch.set_rng_state(state)
         masked_image = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
 
-        print('SHAPE OF MASKED IMAGE BEFORE TRANSFORMATIONS: ' + str(masked_image.shape))
-
-
         return_dict['masked_image_pixel_values'] = self.transforms(masked_image.cpu().numpy()).to(self.device)
+
+        print('SHAPE OF MASKED IMAGE POST TRANSFORMATIONS: ' + str(masked_image.shape))
+
+
 
         # TODO: Do we still need this?
         if random.random() > self.ucg:
