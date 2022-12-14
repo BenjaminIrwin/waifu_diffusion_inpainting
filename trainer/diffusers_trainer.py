@@ -393,8 +393,7 @@ class InpaintDataset(torch.utils.data.Dataset):
         torch.set_rng_state(state)
         return_dict['mask_pixel_values'] = self.transforms(mask).to(self.device)
         print('MASK SHAPE PRE-BINARIZATION: ' + str(return_dict['mask_pixel_values'].shape))
-        return_dict['mask_pixel_values'] = (return_dict['mask_pixel_values'] >= 0.5).type(return_dict['mask_pixel_values'].type())
-
+        return_dict['mask_pixel_values'] = (return_dict['mask_pixel_values'] >= 0.5).type(return_dict['mask_pixel_values'].type())._resize(1, 256, 256)
         print('MASK SHAPE POST-BINARIZATION: ' + str(return_dict['mask_pixel_values'].shape))
 
         torch.set_rng_state(state)
