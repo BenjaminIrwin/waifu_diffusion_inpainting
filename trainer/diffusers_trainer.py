@@ -816,7 +816,7 @@ def main():
                 masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
                 latents = latent_dist.sample() * 0.18215
                 masked_image_latents = masked_latent_dist.sample() * 0.18215
-                print('mask shape pre interpolation', batch["mask_pixel_values"])
+                print('mask shape pre interpolation', batch["mask_pixel_values"].shape)
                 mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8) # COULD BE HERE
                 print('mask shape post interpolation', mask.shape)
 
