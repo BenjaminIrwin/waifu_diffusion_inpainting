@@ -2,6 +2,7 @@ import random
 
 import torch
 from PIL import Image
+from torchvision.transforms import transforms
 
 
 def get_cutout_holes(height, width, min_holes=8, max_holes=32, min_height=16, max_height=128, min_width=16,
@@ -30,29 +31,39 @@ def generate_random_mask(image):
 
 
 def image_to_tensor(image_path):
-    image = Image.open(image_path)
-    image = image.resize((256, 256))
-    image = image.convert('RGB')
-    image = torch.tensor(list(image.getdata())).float()
-    image = image.view(3, 256, 256) / 255.
-    return image
+    image = Image.open(image_path).convert('RGB')
+    # Define a transform to convert PIL
+    # image to a Torch tensor
+    transform = transforms.Compose([
+        transforms.PILToTensor()
+    ])
+
+    # transform = transforms.PILToTensor()
+    # Convert the PIL image to Torch tensor
+    return transform(image)
+
 
 def tensor_to_image(tensor):
-    image = tensor * 255.
-    image = image.permute(1, 2, 0).byte()
-    image = Image.fromarray(image.numpy())
-    return image
+    # define a transform to convert a tensor to PIL image
+    transform = transforms.ToPILImage()
+    # convert the tensor to PIL image using above transform
+    return transform(tensor)
 
 def generate_masked_image(image, mask):
     return image * (mask < 0.5)
 
-mask, masked_image = generate_random_mask(image_to_tensor('golden.jpeg'))
-print(mask.shape)
-print(masked_image.shape)
 
-path = '/content/waifu_diffusion_inpainting/images/i2.png'
+mask = image_to_tensor('/Users/TheBirwinator/PycharmProjects/waifu-diffusion/minidataset/m0.png')
+print('MASK SHAPE PRE-BINARIZATION: ' + str(mask.shape))
+masks_sum = mask.sum(axis=0)
+binarized_mask = torch.where(masks_sum > 0, 1.0, 0.).unsqueeze(0)
+print('MASK SHAPE POST-BINARIZATION: ' + str(binarized_mask.shape))
+
+img = image_to_tensor('/Users/TheBirwinator/PycharmProjects/waifu-diffusion/minidataset/i0.png')
+tensor_to_image(generate_masked_image(img, binarized_mask)).show()
+tensor_to_image(img).show()
+
+
 
 def extract_image_number(path):
     return int(path.split('/')[-1].split('.')[0][1:])
-
-print(extract_image_number(path))
