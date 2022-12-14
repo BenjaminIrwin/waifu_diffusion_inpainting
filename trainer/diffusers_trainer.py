@@ -409,7 +409,7 @@ class InpaintDataset(torch.utils.data.Dataset):
 
         print('SHAPE OF MASKED IMAGE AS TENSOR: ' + str(masked_image.shape))
         numpy = masked_image.cpu().numpy()
-        print('SHAPE OF MASKED IMAGE AS NUMPY ARRAY: ' + str(numpy.shape))
+        print('SHAPE OF MASKED IMAGE AS NUMPY ARRAY: ' + str(numpy.shape))  # (3, 256, 256)
 
         return_dict['masked_image_pixel_values'] = self.transforms(numpy).to(self.device)
 
