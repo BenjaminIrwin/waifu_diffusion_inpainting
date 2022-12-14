@@ -409,7 +409,7 @@ class InpaintDataset(torch.utils.data.Dataset):
 
         return_dict['masked_image_pixel_values'] = self.transforms(masked_image.cpu().numpy()).to(self.device)
 
-        print('SHAPE OF MASKED IMAGE POST TRANSFORMATIONS: ' + str(return_dict['masked_image_pixel_values']))
+        print('SHAPE OF MASKED IMAGE POST TRANSFORMATIONS: ' + str(return_dict['masked_image_pixel_values'].shape))
 
 
 
