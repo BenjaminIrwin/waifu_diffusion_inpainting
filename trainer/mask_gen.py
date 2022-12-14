@@ -46,9 +46,8 @@ def tensor_to_image(tensor):
 def generate_masked_image(image, mask):
     return image * (mask < 0.5)
 
-mask, masked_image = generate_random_mask(image_to_tensor('golden.jpeg'))
-print(mask.shape)
-print(masked_image.shape)
+
+msk = Image.open(self.mask_files[idx]).convert('RGB')
 
 path = '/content/waifu_diffusion_inpainting/images/i2.png'
 
