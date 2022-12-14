@@ -292,14 +292,10 @@ class ImageStore:
         print('ImageStore: Loading images from ' + self.data_dir)
         self.image_files = []
         [self.image_files.extend(glob.glob(f'{data_dir}' + '/i*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
-        print(f'ImageStore: Found {len(self.image_files)} images')
-        print(self.image_files)
 
         print('ImageStore: Loading masks from ' + self.data_dir)
         self.mask_files = []
         [self.mask_files.extend(glob.glob(f'{data_dir}' + '/m*.' + e)) for e in ['jpg', 'jpeg', 'png', 'bmp', 'webp']]
-        print(f'ImageStore: Found {len(self.mask_files)} masks')
-        print(self.mask_files)
 
         self.clean()
 
@@ -357,17 +353,12 @@ class ImageStore:
             # Check if the number exists in the mask dictionary
             if img_num in mask_dict:
                 # If it does, add the corresponding filenames to the clean lists
-                print('FOUND MATCHING MASK AND IMAGE: ' + str(img_num))
                 clean_images.append(image_dict[img_num])
                 clean_masks.append(mask_dict[img_num])
 
-        print(clean_images)
-        print(clean_masks)
 
         self.image_files = clean_images
-        print(self.image_files)
         self.mask_files = clean_masks
-        print(self.mask_files)
 
 
 class InpaintDataset(torch.utils.data.Dataset):
@@ -398,24 +389,15 @@ class InpaintDataset(torch.utils.data.Dataset):
 
         state = torch.get_rng_state()
         return_dict['image_pixel_values'] = self.transforms(image).to(self.device)
-        print('SHAPE OF IMAGE: ' + str(return_dict['image_pixel_values'].shape))
 
         torch.set_rng_state(state)
         return_dict['mask_pixel_values'] = self.transforms(mask).to(self.device)
         return_dict['mask_pixel_values'] = (return_dict['mask_pixel_values'] >= 0.5).type(return_dict['mask_pixel_values'].type())
 
         torch.set_rng_state(state)
-        masked_image = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
-        #
-        # print('SHAPE OF MASKED IMAGE AS TENSOR: ' + str(masked_image.shape))
-        # numpy = masked_image.cpu().numpy()
-        # print('SHAPE OF MASKED IMAGE AS NUMPY ARRAY: ' + str(numpy.shape))  # (3, 256, 256)
 
         # return_dict['masked_image_pixel_values'] = self.transforms(numpy).to(self.device)
         return_dict['masked_image_pixel_values'] = generate_masked_image(return_dict['image_pixel_values'], return_dict['mask_pixel_values'])
-
-        print('SHAPE OF MASKED IMAGE POST TRANSFORMATIONS: ' + str(return_dict['masked_image_pixel_values'].shape))
-
 
 
         # TODO: Do we still need this?
@@ -433,15 +415,9 @@ class InpaintDataset(torch.utils.data.Dataset):
         mask_values = [example["mask_pixel_values"] for example in examples]
         masked_image_values = [example["masked_image_pixel_values"] for example in examples]
 
-        print('Image Pixel Values Shape PRE-COLLATE: ', pixel_values[0].shape)
-        print('Masked Image Pixel Values Shape PRE COLLATE: ', masked_image_values[0].shape)
-
         pixel_values = torch.stack(pixel_values).to(memory_format=torch.contiguous_format).float()
         mask_values = torch.stack(mask_values).to(memory_format=torch.contiguous_format).float()
         masked_image_values = torch.stack(masked_image_values).to(memory_format=torch.contiguous_format).float()
-
-        print('Image Pixel Values Shape POST COLLATE: ', pixel_values.shape)
-        print('Masked Image Pixel Values Shape POST COLLATE: ', masked_image_values.shape)
 
         if args.extended_mode_chunks < 2:
             max_length = self.tokenizer.model_max_length - 2
@@ -517,9 +493,6 @@ class InpaintDataset(torch.utils.data.Dataset):
                     input_ids = self.text_encoder(torch.asarray(input_ids).to(self.device),
                                                   output_hidden_states=True).last_hidden_state
         input_ids = torch.stack(tuple(input_ids))
-
-        print('Image Pixel Values Shape POST COLLATE: ', pixel_values.shape)
-        print('Masked Image Pixel Values Shape POST COLLATE: ', masked_image_values.shape)
 
         batch = {
             "input_ids": input_ids,
@@ -839,16 +812,16 @@ def main():
 
                 b_start = time.perf_counter()
                 # TODO: do we need with_torch_no_grad here?
-                print('SHAPE OF IMAGE BATCH BEFORE VAE: ', batch["image_pixel_values"].shape)
                 latent_dist = vae.encode(batch["image_pixel_values"].to(dtype=weight_dtype)).latent_dist
-                print('SHAPE OF MASKED IMAGE BATCH BEFORE VAE: ', batch["masked_image_pixel_values"].shape)
                 masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
                 latents = latent_dist.sample() * 0.18215
                 masked_image_latents = masked_latent_dist.sample() * 0.18215
-                mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8)
+                print('mask shape pre interpolation', batch["mask_pixel_values"])
+                mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8) # COULD BE HERE
+                print('mask shape post interpolation', mask.shape)
 
 
-            # Sample noise
+                # Sample noise
                 noise = torch.randn_like(latents)
                 bsz = latents.shape[0]
                 # Sample a random timestep for each image
@@ -859,6 +832,7 @@ def main():
                 # (this is the forward diffusion process)
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
                 latent_model_input = torch.cat([noisy_latents, mask, masked_image_latents], dim=1)
+                print(f'latent_model_input.shape: {latent_model_input.shape}')
 
                 # Get the embedding for conditioning
                 encoder_hidden_states = batch['input_ids']
@@ -890,7 +864,7 @@ def main():
                     with unet.join(), text_encoder.join():
                         # Predict the noise residual and compute loss
                         with torch.autocast('cuda', enabled=args.fp16):
-                            noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                            noise_pred = unet(latent_model_input, timesteps, encoder_hidden_states).sample
 
                         loss = torch.nn.functional.mse_loss(noise_pred.float(), target.float(), reduction="mean")
 
