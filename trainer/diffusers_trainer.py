@@ -428,6 +428,9 @@ class InpaintDataset(torch.utils.data.Dataset):
         mask_values = [example["mask_pixel_values"] for example in examples]
         masked_image_values = [example["masked_image_pixel_values"] for example in examples]
 
+        print('Image Pixel Values Shape PRE COLLATE: ', pixel_values.shape)
+        print('Masked Image Pixel Values Shape PRE COLLATE: ', masked_image_values.shape)
+
         pixel_values = torch.stack(pixel_values).to(memory_format=torch.contiguous_format).float()
         mask_values = torch.stack(mask_values).to(memory_format=torch.contiguous_format).float()
         masked_image_values = torch.stack(masked_image_values).to(memory_format=torch.contiguous_format).float()
