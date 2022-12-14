@@ -825,7 +825,7 @@ def main():
                 # TODO: do we need with_torch_no_grad here?
                 print('SHAPE OF IMAGE BATCH BEFORE VAE: ', batch["image_pixel_values"].shape)
                 latent_dist = vae.encode(batch["image_pixel_values"].to(dtype=weight_dtype)).latent_dist
-                print('SHAPE OF MASKED IMAGE BATCH BEFORE VAE: ', batch["masked_pixel_values"].shape)
+                print('SHAPE OF MASKED IMAGE BATCH BEFORE VAE: ', batch["masked_image_pixel_values"].shape)
                 masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
                 latents = latent_dist.sample() * 0.18215
                 masked_image_latents = masked_latent_dist.sample() * 0.18215
