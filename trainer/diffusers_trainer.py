@@ -506,6 +506,10 @@ class InpaintDataset(torch.utils.data.Dataset):
                     input_ids = self.text_encoder(torch.asarray(input_ids).to(self.device),
                                                   output_hidden_states=True).last_hidden_state
         input_ids = torch.stack(tuple(input_ids))
+
+        print('Image Pixel Values Shape POST COLLATE: ', pixel_values.shape)
+        print('Masked Image Pixel Values Shape POST COLLATE: ', masked_image_values.shape)
+
         batch = {
             "input_ids": input_ids,
             'tokens': tokens,
