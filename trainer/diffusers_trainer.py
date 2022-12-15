@@ -237,7 +237,7 @@ class Resize():
 
         self.resize = self.__no_migration
 
-    def __no_migration(self, image_path: str, w: int, h: int) -> Image:
+    def __no_migration(self, image_path: str, w=512, h=512) -> Image:
         return ImageOps.fit(
             Image.open(image_path),
             (w, h),
@@ -246,7 +246,7 @@ class Resize():
             method=Image.Resampling.LANCZOS
         ).convert(mode='RGB')
 
-    def __migration(self, image_path: str, w: int, h: int) -> Image:
+    def __migration(self, image_path: str, w=512, h=512) -> Image:
         filename = re.sub('\.[^/.]+$', '', os.path.split(image_path)[1])
 
         image = ImageOps.fit(
@@ -309,8 +309,8 @@ class ImageStore:
 
     # get image by index
     def get_image_and_mask(self, idx):
-        img = Image.open(self.image_files[idx]).convert('RGB')
-        msk = Image.open(self.mask_files[idx]).convert('RGB')
+        img = self.resizer(self.image_files[idx])
+        msk = self.resizer(self.mask_files[idx])
         return img, msk
 
     # gets caption by removing the extension from the filename and replacing it with .txt
@@ -318,7 +318,7 @@ class ImageStore:
         # filename = re.sub('\.[^/.]+$', '', self.image_files[idx]) + '.txt'
         # with open(filename, 'r', encoding='UTF-8') as f:
         #     return f.read()
-        return 'architectural render with people ' + re.sub('\.[^/.]+$', '', self.image_files[idx])
+        return 'architectural render with people'
 
     def extract_input_num(self, path):
         return int(path.split('/')[-1].split('.')[0][1:])
@@ -417,7 +417,6 @@ class InpaintDataset(torch.utils.data.Dataset):
         pixel_values = [example["image_pixel_values"] for example in examples]
         mask_values = [example["mask_pixel_values"] for example in examples]
         masked_image_values = [example["masked_image_pixel_values"] for example in examples]
-        names = [example["input_ids"] for example in examples]
 
         pixel_values = torch.stack(pixel_values).to(memory_format=torch.contiguous_format).float()
         mask_values = torch.stack(mask_values).to(memory_format=torch.contiguous_format).float()
@@ -499,7 +498,6 @@ class InpaintDataset(torch.utils.data.Dataset):
         input_ids = torch.stack(tuple(input_ids))
 
         batch = {
-            'names': names,
             "input_ids": input_ids,
             'tokens': tokens,
             "image_pixel_values": pixel_values,
@@ -817,7 +815,7 @@ def main():
                         progress_bar.update(1)
                     global_step += 1
                     continue
-                print(batch['names'])
+
                 b_start = time.perf_counter()
                 # TODO: do we need with_torch_no_grad here?
                 with torch.no_grad():
