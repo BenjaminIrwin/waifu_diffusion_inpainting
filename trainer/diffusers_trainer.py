@@ -804,11 +804,14 @@ def main():
     # train!
     try:
         loss = torch.tensor(0.0, device=device, dtype=weight_dtype)
+        print('Initiating training...')
         for epoch in range(args.epochs):
+            print(f'Epoch {epoch + 1}/{args.epochs}')
             unet.train()
             if args.train_text_encoder:
                 text_encoder.train()
             for _, batch in enumerate(train_dataloader):
+                print(f'Batch {_ + 1}/{num_steps_per_epoch}')
                 if args.resume and global_step < target_global_step:
                     if rank == 0:
                         progress_bar.update(1)
