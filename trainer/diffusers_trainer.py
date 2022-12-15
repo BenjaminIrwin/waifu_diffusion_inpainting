@@ -863,6 +863,7 @@ def main():
                         scaler.step(optimizer)
                         scaler.update()
                         lr_scheduler.step()
+                        print('Zeroing gradients...')
                         optimizer.zero_grad()
                 else:
                     with unet.join(), text_encoder.join():
@@ -879,6 +880,7 @@ def main():
                         scaler.step(optimizer)
                         scaler.update()
                         lr_scheduler.step()
+                        print('Zeroing gradients...')
                         optimizer.zero_grad()
 
                         # Update EMA
