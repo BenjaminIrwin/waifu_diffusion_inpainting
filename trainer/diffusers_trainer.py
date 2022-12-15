@@ -314,8 +314,8 @@ class ImageStore:
 
     # get image by index
     def get_image_and_mask(self, idx):
-        img = self.resizer(self.image_files[idx])
-        msk = self.resizer(self.mask_files[idx])
+        img = Image.open(self.image_files[idx]).convert('RGB')
+        msk = Image.open(self.mask_files[idx]).convert('RGB')
         return img, msk
 
     # gets caption by removing the extension from the filename and replacing it with .txt
