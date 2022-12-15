@@ -92,7 +92,7 @@ parser.add_argument('--clip_penultimate', type=bool_t, default='False',
 parser.add_argument('--use_xformers', type=bool_t, default='False', help='Use memory efficient attention')
 parser.add_argument('--wandb', dest='enablewandb', type=bool_t, default='True',
                     help='Enable WeightsAndBiases Reporting')
-parser.add_argument('--inference', dest='enableinference', type=bool_t, default='True',
+parser.add_argument('--inference', dest='enableinference', type=bool_t, default='False',
                     help='Enable Inference during training (Consumes 2GB of VRAM)')
 parser.add_argument('--extended_validation', type=bool_t, default='False',
                     help='Perform extended validation of images to catch truncated or corrupt images.')
@@ -105,7 +105,6 @@ parser.add_argument('--extended_mode_chunks', type=int, default=0,
 parser.add_argument("--train_text_encoder", action="store_true", help="Whether to train the text encoder")
 
 args = parser.parse_args()
-
 
 def setup():
     torch.distributed.init_process_group("nccl", init_method="env://")
@@ -142,6 +141,18 @@ def binary_mask_to_tensor(image) -> torch.Tensor:
     tensor = tensor.view(1, 256, 256)
 
     return tensor
+
+def debug_memory():
+    import collections, gc, resource, torch
+    print('maxrss = {}'.format(
+        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+    tensors = collections.Counter(
+        (str(o.device), str(o.dtype), tuple(o.shape))
+        for o in gc.get_objects()
+        if torch.is_tensor(o)
+    )
+    for line in sorted(tensors.items()):
+        print('{}\t{}'.format(*line))
 
 
 def get_gpu_ram() -> str:
@@ -810,6 +821,7 @@ def main():
                 text_encoder.train()
             for _, batch in enumerate(train_dataloader):
                 print(f'Batch {_ + 1}/{num_steps_per_epoch}')
+                debug_memory()
                 if args.resume and global_step < target_global_step:
                     if rank == 0:
                         progress_bar.update(1)
@@ -869,7 +881,7 @@ def main():
                     with unet.join(), text_encoder.join():
                         # Predict the noise residual and compute loss
                         with torch.autocast('cuda', enabled=args.fp16):
-                            noise_pred = unet(latent_model_input, timesteps, encoder_hidden_states).sample
+                            noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
                         loss = torch.nn.functional.mse_loss(noise_pred.float(), target.float(), reduction="mean")
 
