@@ -13,3 +13,4 @@ pynvml~=11.4.1
 psutil~=5.9.0
 accelerate==0.13.1
 scipy==1.9.3
+protobuf==3.20.*
