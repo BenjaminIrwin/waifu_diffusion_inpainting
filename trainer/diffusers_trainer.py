@@ -318,7 +318,7 @@ class ImageStore:
         # filename = re.sub('\.[^/.]+$', '', self.image_files[idx]) + '.txt'
         # with open(filename, 'r', encoding='UTF-8') as f:
         #     return f.read()
-        return 'architectural render with people'
+        return 'architectural render with people ' + re.sub('\.[^/.]+$', '', self.image_files[idx])
 
     def extract_input_num(self, path):
         return int(path.split('/')[-1].split('.')[0][1:])
