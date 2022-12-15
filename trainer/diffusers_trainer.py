@@ -818,11 +818,12 @@ def main():
 
                 b_start = time.perf_counter()
                 # TODO: do we need with_torch_no_grad here?
-                latent_dist = vae.encode(batch["image_pixel_values"].to(dtype=weight_dtype)).latent_dist
-                masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
-                latents = latent_dist.sample() * 0.18215
-                masked_image_latents = masked_latent_dist.sample() * 0.18215
-                mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8) # COULD BE HERE
+                with torch.no_grad():
+                    latent_dist = vae.encode(batch["image_pixel_values"].to(dtype=weight_dtype)).latent_dist
+                    masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
+                    latents = latent_dist.sample() * 0.18215
+                    masked_image_latents = masked_latent_dist.sample() * 0.18215
+                    mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8)
 
 
                 # Sample noise
