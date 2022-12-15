@@ -804,7 +804,6 @@ def main():
         loss = torch.tensor(0.0, device=device, dtype=weight_dtype)
         print('Initiating training...')
         for epoch in range(args.epochs):
-            print(f'Epoch {epoch + 1}/{args.epochs}')
             unet.train()
             if args.train_text_encoder:
                 text_encoder.train()
