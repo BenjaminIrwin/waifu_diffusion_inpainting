@@ -195,7 +195,12 @@ class Validation():
 
     def __validate(self, fp: str) -> bool:
         try:
-            Image.open(fp)
+            # Check if image dimensions are 512 x 512
+            #TODO: Clean this
+            with Image.open(fp) as img:
+                width, height = img.size
+                if width != 512 or height != 512:
+                    return False
             return True
         except:
             print(f'WARNING: Image cannot be opened: {fp}')
