@@ -820,10 +820,10 @@ def main():
                 # TODO: do we need with_torch_no_grad here?
                 with torch.no_grad():
                     latent_dist = vae.encode(batch["image_pixel_values"].to(dtype=weight_dtype)).latent_dist
-                    masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
+                    # masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
                     latents = latent_dist.sample() * 0.18215
-                    masked_image_latents = masked_latent_dist.sample() * 0.18215
-                    mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8)
+                    # masked_image_latents = masked_latent_dist.sample() * 0.18215
+                    # mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8)
 
 
                 # Sample noise
@@ -836,7 +836,7 @@ def main():
                 # Add noise to the latents according to the noise magnitude at each timestep
                 # (this is the forward diffusion process)
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
-                latent_model_input = torch.cat([noisy_latents, mask, masked_image_latents], dim=1)
+                # latent_model_input = torch.cat([noisy_latents, mask, masked_image_latents], dim=1)
 
                 # Get the embedding for conditioning
                 encoder_hidden_states = batch['input_ids']
@@ -853,7 +853,7 @@ def main():
                         # Predict the noise residual and compute loss
                         with torch.autocast('cuda', enabled=args.fp16):
                             # NOTE: this is where the new additional channels added are used
-                            noise_pred = unet(latent_model_input, timesteps, encoder_hidden_states).sample
+                            noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
                         loss = torch.nn.functional.mse_loss(noise_pred.float(), target.float(), reduction="mean")
 
