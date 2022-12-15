@@ -392,10 +392,8 @@ class InpaintDataset(torch.utils.data.Dataset):
 
         torch.set_rng_state(state)
         transformed_mask = self.transforms(mask).to(self.device)
-        print('MASK SHAPE PRE-BINARIZATION: ' + str(transformed_mask.shape))
         masks_sum = transformed_mask.sum(axis=0)
         binarized_mask = torch.where(masks_sum > 0, 1.0, 0.).unsqueeze(0)
-        print('MASK SHAPE POST-BINARIZATION: ' + str(binarized_mask.shape))
 
         return_dict['mask_pixel_values'] = binarized_mask
 
@@ -740,7 +738,7 @@ def main():
     store = ImageStore(args.dataset)
     dataset = InpaintDataset(store, tokenizer, text_encoder, device, ucg=args.ucg)
 
-    print(f'STORE_LEN: {len(store)}')
+    print(f'DATASET SIZE: {len(store)}')
 
     # TODO: add mask support here (in collate_fn)
     train_dataloader = torch.utils.data.DataLoader(
@@ -824,9 +822,7 @@ def main():
                 masked_latent_dist = vae.encode(batch["masked_image_pixel_values"].to(dtype=weight_dtype)).latent_dist
                 latents = latent_dist.sample() * 0.18215
                 masked_image_latents = masked_latent_dist.sample() * 0.18215
-                print('mask shape pre interpolation', batch["mask_pixel_values"].shape)
                 mask = interpolate(batch["mask_pixel_values"], scale_factor=1 / 8) # COULD BE HERE
-                print('mask shape post interpolation', mask.shape)
 
 
                 # Sample noise
@@ -840,7 +836,6 @@ def main():
                 # (this is the forward diffusion process)
                 noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
                 latent_model_input = torch.cat([noisy_latents, mask, masked_image_latents], dim=1)
-                print(f'latent_model_input.shape: {latent_model_input.shape}')
 
                 # Get the embedding for conditioning
                 encoder_hidden_states = batch['input_ids']
