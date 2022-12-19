@@ -320,10 +320,9 @@ class ImageStore:
 
     # gets caption by removing the extension from the filename and replacing it with .txt
     def get_caption(self, idx) -> str:
-        # filename = re.sub('\.[^/.]+$', '', self.image_files[idx]) + '.txt'
-        # with open(filename, 'r', encoding='UTF-8') as f:
-        #     return f.read()
-        return 'architectural render with people'
+        filename = re.sub('\.[^/.]+$', '', self.image_files[idx]) + '.txt'
+        with open(filename, 'r', encoding='UTF-8') as f:
+            return f.read()
 
     def extract_input_num(self, path):
         return int(path.split('/')[-1].split('.')[0][1:])
