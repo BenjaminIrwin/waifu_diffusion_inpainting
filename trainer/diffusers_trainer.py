@@ -92,7 +92,7 @@ parser.add_argument('--clip_penultimate', type=bool_t, default='False',
 parser.add_argument('--use_xformers', type=bool_t, default='False', help='Use memory efficient attention')
 parser.add_argument('--wandb', dest='enablewandb', type=bool_t, default='True',
                     help='Enable WeightsAndBiases Reporting')
-parser.add_argument('--inference', dest='enableinference', type=bool_t, default='True',
+parser.add_argument('--inference', dest='enableinference', type=bool_t, default='False',
                     help='Enable Inference during training (Consumes 2GB of VRAM)')
 parser.add_argument('--extended_validation', type=bool_t, default='False',
                     help='Perform extended validation of images to catch truncated or corrupt images.')
