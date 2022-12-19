@@ -747,6 +747,7 @@ def main():
     # TODO: add mask support here (in collate_fn)
     train_dataloader = torch.utils.data.DataLoader(
         dataset,
+        batch_size=args.batch_size,
         num_workers=0,
         collate_fn=dataset.collate_fn
     )
